@@ -13,14 +13,17 @@ builder.Services.AddDbContext<DataContext>(opt =>
     opt.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")); 
 });
 
+builder.Services.AddCors(); //=>to provide CORS support btw client and BE apps (two different hosts). - Part 1
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 
+//=>to provide CORS support btw client and BE apps (two different hosts). - Part 2 - adding it to middleware part.
+app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod().WithOrigins("https://localhost:4200")); 
+
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();
