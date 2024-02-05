@@ -1,19 +1,20 @@
+using System.Text;
 using API.Data;
+using API.Extensions;
+using API.Interfaces;
+using API.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
 builder.Services.AddControllers();
-
-//=>adding the dbcontext as a service by defining the configuration for connection string;
-builder.Services.AddDbContext<DataContext>(opt =>
-{
-    opt.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")); 
-});
-
-builder.Services.AddCors(); //=>to provide CORS support btw client and BE apps (two different hosts). - Part 1
+//**=>In order to call the app related services on the extension metot that we defined in it's specific class;
+builder.Services.AddApplicationServices(builder.Configuration);
+//**=>In order to call the identity related services on the extension metot that we defined in it's specific class;
+builder.Services.AddIdentityServices(builder.Configuration);
 
 var app = builder.Build();
 
@@ -22,8 +23,10 @@ var app = builder.Build();
 //=>to provide CORS support btw client and BE apps (two different hosts). - Part 2 - adding it to middleware part.
 app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod().WithOrigins("https://localhost:4200")); 
 
-app.UseHttpsRedirection();
-app.UseAuthorization();
+//=>In order to check whether the user passes authentication and authorization to reach the endpoints;
+app.UseAuthentication(); //=>Asks if the visitor/client has a valid token or not. - kimlik dogrulama
+app.UseAuthorization(); //=>If you have a valid token then what are you allowed to do? - yetkinlik/yetki sorgulama
+
 app.MapControllers();
 
 app.Run();
