@@ -2,6 +2,8 @@ import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { NavComponent } from "./nav/nav.component";
+import { AccountService } from './_services/account.service';
+import { User } from './_models/user';
 
 @Component({
     selector: 'app-root',
@@ -15,9 +17,14 @@ export class AppComponent implements OnInit{
   users: any; 
 
   //=>dependency injection in Angular;
-  constructor(private http:HttpClient){}
+  constructor(private http:HttpClient, private accountService:AccountService){}
 
   ngOnInit(): void {
+    this.getUsers();
+    this.setCurrentUser();
+  }
+
+  getUsers(){
     //=>url is the endpoint which is defined on the API project(BE side);
     this.http.get('https://localhost:5001/api/users').subscribe({
       next: response => this.users = response,
@@ -25,6 +32,17 @@ export class AppComponent implements OnInit{
       complete: () => console.log('Request has completed.')
     }); //=>subscribe to observe an Observable which is the return type of 
     //data from the HttpRequest.
+  }
+
+
+
+  //=>Uyg. ayaga kalktiginda localStorage'i kontrol edip bu dogrultuda kalici olarak verileri saklayacak olan
+  //ve AccountService'te tanimladigimiz Observable'imiza setleme yapilacak;
+  setCurrentUser(){
+     const userString = localStorage.getItem('user');
+     if(!userString) return; //nullsa asagidaki gibi ekleme yapilacak, localstorage'da user bilgisi varsa ekleme yapilmayacak.
+     const user:User = JSON.parse(userString);
+     this.accountService.setCurrentUser(user);
   }
 
 }
