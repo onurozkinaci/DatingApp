@@ -1,40 +1,26 @@
-import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { NavComponent } from "./nav/nav.component";
 import { AccountService } from './_services/account.service';
 import { User } from './_models/user';
+import { HomeComponent } from "./home/home.component";
 
 @Component({
     selector: 'app-root',
     standalone: true,
     templateUrl: './app.component.html',
     styleUrl: './app.component.css',
-    imports: [RouterOutlet, NavComponent]
+    imports: [RouterOutlet, NavComponent, HomeComponent]
 })
 export class AppComponent implements OnInit{
   title = 'Dating app'; //title: string => automatically assigns the type.
-  users: any; 
 
   //=>dependency injection in Angular;
-  constructor(private http:HttpClient, private accountService:AccountService){}
+  constructor(private accountService:AccountService){}
 
   ngOnInit(): void {
-    this.getUsers();
     this.setCurrentUser();
   }
-
-  getUsers(){
-    //=>url is the endpoint which is defined on the API project(BE side);
-    this.http.get('https://localhost:5001/api/users').subscribe({
-      next: response => this.users = response,
-      error: error => console.log(error),
-      complete: () => console.log('Request has completed.')
-    }); //=>subscribe to observe an Observable which is the return type of 
-    //data from the HttpRequest.
-  }
-
-
 
   //=>Uyg. ayaga kalktiginda localStorage'i kontrol edip bu dogrultuda kalici olarak verileri saklayacak olan
   //ve AccountService'te tanimladigimiz Observable'imiza setleme yapilacak;
