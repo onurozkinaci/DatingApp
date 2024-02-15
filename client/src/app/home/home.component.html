@@ -13,8 +13,7 @@
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-4">
-                <!-- "users" parent olan home.component'te tanimlidir ve api'den cekilen degerler ona atanir; -->
-                <app-register [usersFromHomeComponent]="users" (cancelRegister)="cancelRegisterMode($event)"></app-register>
+                <app-register (cancelRegister)="cancelRegisterMode($event)"></app-register>
             </div>
         </div>
     </div>
