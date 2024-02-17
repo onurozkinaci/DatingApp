@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AccountService } from '../_services/account.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-register',
@@ -12,7 +13,7 @@ import { AccountService } from '../_services/account.service';
 export class RegisterComponent {
   //@Input() usersFromHomeComponent:any;
   @Output() cancelRegister = new EventEmitter(); //=>to emit something from child to parent.
-   constructor(private accountService:AccountService){
+   constructor(private accountService:AccountService, private toaster: ToastrService){
    }
    model:any = {}
    register(){
@@ -21,7 +22,10 @@ export class RegisterComponent {
          next:() => {
             this.cancel(); //=>to close the register form after the operation is completed.
          },
-         error:error => console.log(error)
+         error:error => {
+          this.toaster.error(error.error); //=>the error message will be given with toaster. 
+          console.log(error);
+         }
      });
    }
    cancel(){
