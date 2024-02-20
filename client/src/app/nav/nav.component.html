@@ -2,9 +2,9 @@
     <div class="container">
       <!--Below routerLink('/') will directly redirect to HomeComponent;-->
       <a class="navbar-brand" routerLink="/" routerLinkActive="active">Dating App</a>
-      <!--"async pipe" which unsubscribes from the observable automatically when its job is done-->
-      @if(accountService.currentUser$|async){ 
         <ul class="navbar-nav me-auto mb-2 mb-md-0">
+          <!--"async pipe" which unsubscribes from the observable automatically when its job is done-->
+          @if(accountService.currentUser$|async){ 
           <ng-container>
             <li class="nav-item">
               <a class="nav-link" routerLink="/members" routerLinkActive="active">Matches</a>
@@ -16,8 +16,11 @@
               <a class="nav-link" routerLink="/messages" routerLinkActive="active">Messages</a>
             </li>
          </ng-container>
+        }
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/errors" routerLinkActive="active">Errors</a>
+        </li>
         </ul>
-      }
 
       <div class="dropdown" ngbDropdown *ngIf="(accountService.currentUser$|async) as user"> <!--"async pipe" with alias-->
           <a ngbDropdownToggle class="dropdown-toggle text-light text-decoration-none" >Welcome {{user.username | titlecase}}</a>
