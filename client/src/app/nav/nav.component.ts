@@ -24,7 +24,7 @@ export class NavComponent {
     //=>return type'i Observable old. subscribe olduk;
       this.accountService.login(this.model).subscribe({
          next: _ => this.router.navigateByUrl('/members'), //=>koddan yonlendirme saglamak icin.
-         error: error => this.toaster.error(error.error) //=>the error message will be given with toaster.
+         //error kismi tanimlanmadi cunku interceptorda(error.interceptor.ts) handle ediliyor.
       });
    }
    logout(){

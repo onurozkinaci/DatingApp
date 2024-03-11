@@ -21,7 +21,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
                   modelStateErrors.push(error.error.errors[key]);
                 } 
               }
-              throw modelStateErrors;
+              throw modelStateErrors.flat();
             }
             else{ //normal bad request is taken
               toastr.error(error.error,error.status.toString());
