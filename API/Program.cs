@@ -1,5 +1,7 @@
 using API;
+using API.Data;
 using API.Extensions;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,5 +25,22 @@ app.UseAuthentication(); //=>Asks if the visitor/client has a valid token or not
 app.UseAuthorization(); //=>If you have a valid token then what are you allowed to do? - yetkinlik/yetki sorgulama
 
 app.MapControllers();
+
+//--------=>Db'yi seed data ile guncellemek icin; --------
+//=>"app.MapControllers()" sonrasinda ve "app.Run()" oncesinde tanimlanmasi onemli;
+using var scope = app.Services.CreateScope(); //this gives us access to all of the exist services inside this class.
+var services = scope.ServiceProvider;
+try
+{
+  var context = services.GetRequiredService<DataContext>();
+  await context.Database.MigrateAsync();
+  await Seed.SeedUsers(context);
+}
+catch(Exception ex)
+{
+   var logger = services.GetService<ILogger<Program>>();
+   logger.LogError(ex, "An error occured during migration!");
+}
+//--------------------------------------------------------
 
 app.Run();

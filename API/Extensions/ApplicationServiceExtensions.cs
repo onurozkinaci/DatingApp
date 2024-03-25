@@ -20,6 +20,9 @@ public static class ApplicationServiceExtensions
 
         //=>adding our own service in order to provide a JWT(Json Web Token) for the logged in user;
         services.AddScoped<ITokenService, TokenService>();
+        //**own - burada servis olarak tanimlamasini yapmanla injectable olup controllerda inject edilmesi saglaniyor;
+        services.AddScoped<IUserRepository,UserRepository>(); //=>In order to use "Repository Patterns".
+        services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies()); //=>In order to use "AutoMapper", as injectable, etc.
         return services;
    }
 }

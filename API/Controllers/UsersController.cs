@@ -1,5 +1,6 @@
 ﻿using API.Data;
 using API.Entities;
+using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -8,27 +9,37 @@ namespace API.Controllers;
 [Authorize]
 public class UsersController : BaseApiController
 {
-    private readonly DataContext _context;
+    private readonly IUserRepository _userRepository;
+    private readonly IMapper _mapper;
 
-    public UsersController(DataContext context)
+    public UsersController(IUserRepository userRepository, IMapper mapper)
     {
-        _context = context;
+        _userRepository = userRepository;
+        _mapper = mapper;
     }   
 
     //=>------ENDPOINTS------;
-    [AllowAnonymous]
     [HttpGet] //e.g. 'https://localhost:5001/api/users'
-    public async Task<ActionResult<IEnumerable<AppUser>>> GetUsers()
+    //**=>NOTE::MemberDto is kind of a reflection of AppUser and the props between them will be compared with AutoMapper;
+    public async Task<ActionResult<IEnumerable<MemberDto>>> GetUsers()
     {
-        var users = await _context.Users.ToListAsync();
-        return users; /*=>donus tipi belirttigimizden AppUser tipine ait HttpResponse donebiliriz. Belirtmeseydik 200 veya `Ok(users)` ile
-        donersek daha acik bir success message donerdi (200 yerine).*/
-
+        var users = await _userRepository.GetUsersAsync();
+        var usersToReturn = _mapper.Map<IEnumerable<MemberDto>>(users);
+        return Ok(usersToReturn);
     }
 
-    [HttpGet("{id}")] //api/users/id(2,3,etc.) -> e.g. 'https://localhost:5001/api/users/1'
+    [HttpGet("{username}")] //api/users/username -> e.g. 'https://localhost:5001/api/users/christie'
+    public async Task<ActionResult<MemberDto>> GetUser(string username)
+    {
+        var user =  await _userRepository.GetUserByUsernameAsync(username);
+        return Ok(_mapper.Map<MemberDto>(user));
+    }
+
+    /*[HttpGet("{id}")] //api/users/id(2,3,etc.) -> e.g. 'https://localhost:5001/api/users/1'
     public async Task<ActionResult<AppUser>> GetUser(int id)
     {
-        return await _context.Users.FindAsync(id); //=>Finds an entity with the given primary key values.
-    }
+        return await _userRepository.GetUserByIdAsync(id); //=>Finds an entity with the given primary key value.
+    }*/
+
+    
 }
