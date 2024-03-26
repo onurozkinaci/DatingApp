@@ -21,9 +21,4 @@ public class AppUser
 
   //=>one-to-many relationship;
   public List<Photo> Photos { get; set; } = new(); //new List<Photo>()
-
-  /*public int GetAge()
-  {
-    return DateOfBirth.CalculateAge();
-  }*/
 }
