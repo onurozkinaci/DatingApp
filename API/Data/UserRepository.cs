@@ -1,5 +1,7 @@
 ﻿using API.Data;
 using API.Entities;
+using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace API;
@@ -7,11 +9,42 @@ namespace API;
 public class UserRepository : IUserRepository
 {
     private readonly DataContext _context;
+    private readonly IMapper _mapper;
 
-    public UserRepository(DataContext context)
+    public UserRepository(DataContext context, IMapper mapper)
     {
         _context = context;
+        _mapper = mapper;
     }
+
+    //-----AutoMapper optimization;
+    public async Task<MemberDto> GetMemberAsync(string username)
+    {
+       /*return await _context.Users
+             .Where(x=>x.UserName == username)
+             .Select(user => new MemberDto
+             {
+                Id = user.Id,
+                UserName = user.UserName,
+                KnownAs = user.KnownAs,
+                ...
+             }).SingleOrDefaultAsync();*/
+     
+     //**=>Yukaridaki gibi Where ve Select LINQ expressionlari ile parametre atamasi yapmak cok uzun surecegeinden bunun yerine direkt AutoMapper'i inject edip kullanabiliriz; 
+        return await _context.Users
+             .Where(x=>x.UserName == username)
+             .ProjectTo<MemberDto>(_mapper.ConfigurationProvider) //Finds our MappingProfile class from the service that we added to our 'applicationserviceextensions' and mapping from AppUser to MemberDto will be detected.
+             .SingleOrDefaultAsync();
+    }
+
+    public async Task<IEnumerable<MemberDto>> GetMembersAsync()
+    {
+       return await _context.Users
+              .ProjectTo<MemberDto>(_mapper.ConfigurationProvider)
+              .ToListAsync();
+    }
+    //-------------------------------
+
     public async Task<AppUser> GetUserByIdAsync(int id)
     {
         return await _context.Users.FindAsync(id);

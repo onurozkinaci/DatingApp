@@ -4,6 +4,7 @@ public class MemberDto
 {
     public int Id { get; set; }
     public string UserName { get; set; }
+    public string PhotoUrl { get; set; } //main photo of the user
     public int Age { get; set; } //instead of datebirth, directly the age will be shown.
     public string KnownAs { get; set; }
     public DateTime Created { get; set; }
