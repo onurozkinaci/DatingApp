@@ -1,15 +1,14 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { response } from 'express';
 import { BehaviorSubject, map } from 'rxjs';
-import { json } from 'stream/consumers';
 import { User } from '../_models/user';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AccountService {
-  baseUrl = 'https://localhost:5001/api/';
+  baseUrl = environment.apiUrl;
 
   //=>This is defined to store user's login info persisent with a special Observable;
   private currentUserSource = new BehaviorSubject<User|null>(null);
