@@ -21,5 +21,9 @@ export class MembersService {
     //Member => type safely member type result will return from the API call;
     return this.http.get<Member>(this.baseUrl + 'users/' + username)
   }
-  
+
+  updateMember(member:Member){
+     return this.http.put(this.baseUrl + 'users', member)
+  }
+
 }
