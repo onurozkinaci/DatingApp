@@ -9,10 +9,9 @@ export const authGuard: CanActivateFn = (route, state) => {
   const toastr = inject(ToastrService);
   return accountService.currentUser$.pipe(
     map(user => {
-      //alert(user);
       if(user) return true;
       else{ //the user not logged in yet
-         toastr.error('You shall not pass!'); //???TODO: devamli error veriliyor, incelenecek???
+         toastr.error('You shall not pass!');
          return false;
       }
     })
