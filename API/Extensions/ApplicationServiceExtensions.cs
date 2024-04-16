@@ -1,4 +1,5 @@
 ﻿using API.Data;
+using API.Helpers;
 using API.Interfaces;
 using API.Services;
 using Microsoft.EntityFrameworkCore;
@@ -23,6 +24,10 @@ public static class ApplicationServiceExtensions
         //**own - burada servis olarak tanimlamasini yapmanla injectable olup controllerda inject edilmesi saglaniyor;
         services.AddScoped<IUserRepository,UserRepository>(); //=>In order to use "Repository Patterns".
         services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies()); //=>In order to use "AutoMapper", as injectable, etc.
+        services.Configure<CloudinarySettings>(config.GetSection("CloudinarySettings")); //to use the defined Cloudinary configurations
+        //=>Adding Cloudinary photoservices to be able to inject it into other classes()at their constructors);
+        services.AddScoped<IPhotoService, PhotoService>();
+
         return services;
    }
 }
