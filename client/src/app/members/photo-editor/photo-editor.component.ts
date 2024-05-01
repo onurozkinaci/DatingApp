@@ -6,6 +6,8 @@ import { environment } from '../../../environments/environment';
 import { User } from '../../_models/user';
 import { AccountService } from '../../_services/account.service';
 import { take } from 'rxjs';
+import { Photo } from '../../_models/photo';
+import { MembersService } from '../../_services/members.service';
 
 @Component({
   selector: 'app-photo-editor',
@@ -22,7 +24,7 @@ export class PhotoEditorComponent implements OnInit {
   user: User | undefined;
 
   //=>The AccountService is injected since we need to get the loggedin user info here;
-  constructor(private accountService:AccountService){
+  constructor(private accountService:AccountService, private memberService:MembersService){
     this.accountService.currentUser$.pipe(take(1)).subscribe({
         next: user => {
           if(user) this.user = user
@@ -36,6 +38,36 @@ export class PhotoEditorComponent implements OnInit {
 
   fileOverBase(e:any){
     this.hasBaseDropZoneOver = e;
+  }
+
+  setMainPhoto(photo:Photo){
+     this.memberService.setMainPhoto(photo.id).subscribe({
+        next: () => {
+           if(this.user && this.member){
+              //=>to change the main photo of the user on navbar;
+              this.user.photoUrl = photo.url;
+              this.accountService.setCurrentUser(this.user);
+
+              //=>to change the main photo of the user on the memberdetail and memberedit pages;
+              this.member.photoUrl = photo.url;
+              this.member.photos.forEach(p=> {
+                 if(p.isMain) p.isMain = false;
+                 if(p.id === photo.id) photo.isMain = true;
+              })
+           }
+        }
+     })
+  }
+
+  deletePhoto(photoId:number){
+    this.memberService.deletePhoto(photoId).subscribe({
+      next: _ => {
+         if(this.member){
+            //all photos except the removed photo will be returned;
+            this.member.photos = this.member.photos.filter( x=> x.id !== photoId);
+         }
+      }
+    });
   }
 
   initializeUploader(){

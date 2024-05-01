@@ -51,7 +51,7 @@ public class UsersController : BaseApiController
 
        return BadRequest("Failed to update user!");
     }
-
+    
     [HttpPost("add-photo")]
      public async Task<ActionResult<PhotoDto>> AddPhoto(IFormFile file)
      {
@@ -81,5 +81,51 @@ public class UsersController : BaseApiController
         return BadRequest("Problem occured while adding the photo!"); //if photo saving to db fails
         //-----------------
 
+     }
+
+     [HttpPut("set-main-photo/{photoId}")]
+     public async Task <ActionResult> SetMainPhoto(int photoId)
+     {
+        var user = await _userRepository.GetUserByUsernameAsync(User.GetUsername());
+        if(user == null) return NotFound();
+        
+        //to get the photo which is gonna be updated;
+        var photo = user.Photos.FirstOrDefault(x=>x .Id == photoId);
+        if(photo == null) return NotFound();
+
+        //doesnt need to be set as main photo of the user if its already a main photo;
+        if(photo.IsMain) return BadRequest("This is already your main photo!");
+
+        var currentMain = user.Photos.FirstOrDefault(x=>x.IsMain);
+        if(currentMain != null) currentMain.IsMain = false;
+        photo.IsMain = true;
+
+        //=>The tracked changes by EF will be signed to db with SaveChanges() below;
+        if(await _userRepository.SaveAllAsync()) return NoContent(); //since its updating the resource, not creating it
+        
+        return BadRequest("Problem occured while setting the main photo!");
+     }
+
+     [HttpDelete("delete-photo/{photoId}")]
+     public async Task<ActionResult> DeletePhoto(int photoId)
+     {
+         var user = await _userRepository.GetUserByUsernameAsync(User.GetUsername());
+         if(user == null) return NotFound();
+         
+         var photo = user.Photos.FirstOrDefault(x=>x.Id == photoId);
+         if(photo == null) return NotFound();
+
+         if(photo.IsMain) return BadRequest("You cannot delete your main photo!");
+         if(photo.PublicId != null)
+         { 
+             var result = await _photoService.DeletePhotoAsync(photo.PublicId);
+             if(result.Error != null) return BadRequest(result.Error.Message);
+         }
+
+         user.Photos.Remove(photo);
+         //=>Changes for the tracked user entity by EF will be reflected on Db;
+         if(await _userRepository.SaveAllAsync()) return Ok();
+        
+         return BadRequest("Problem deleting photo!");
      }
 }
