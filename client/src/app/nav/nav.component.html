@@ -23,7 +23,7 @@
         </ul>
 
       <div class="dropdown" ngbDropdown *ngIf="(accountService.currentUser$|async) as user"> <!--"async pipe" with alias-->
-          <img src="{{user.photoUrl || '.assets/user.png'}}" alt="user photo">
+          <img src="{{user.photoUrl || './assets/user.png'}}" alt="user photo">
           <a ngbDropdownToggle class="dropdown-toggle text-light text-decoration-none ms-2" >Welcome {{user.username | titlecase}}</a>
           <div ngbDropdownMenu class="dropdown-menu">
                 <a ngbDropdownItem class="dropdown-item" routerLink="/member/edit">Edit profile</a>
